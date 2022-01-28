@@ -5,31 +5,33 @@ from math import sqrt
 from cut_video import cut_custom_video, cut_whole_video
 from queue import Queue
 from threading import Thread
+from parse import *
 
-#Hostname for access to video.
+#Hostname for access to video.  0.0.0.0 will allow access from other devices on network.
 hostName = "0.0.0.0"
 
 #You can choose any available port; by default, it is 8000.
 serverPort = 8080 
 
-#Global variable used to communicate from gen_frames thread to main thread.
+#Global variable used to communicate from gen_frames thread to main thread.  Do not change.
 current_frame = None
 
-#Number of square slices you want.
-number_of_squares = 9
-#Are slices equal size?  If so square root of number_of_squares must be an integer
-equal_size = False
-
-#For custom sizes, define starting position and size in pixels
+# If equal_size is True, will automatically generate equal sized slices in a grid.  custom_size_list can be ignored.
+# If equal_size is False, will use custom_size_list to determine size and number of slices.  number_of_squares can be ignored.
+#Are slices equal size?  If so, square root of number_of_squares must be an integer.
+equal_size = True
+#For custom sizes, define start and end positions in pixels.
 #(start_x, start_y, width, height)
-#start x,y --------------> Width
+#start x,y --------------> Width x
 #         ||-------------|
 #         ||             |
 #         ||             |
 #         ||             |
 #         V|-------------|
-#       Height
-
+#       Height y
+#equal_size = True use:
+number_of_squares = 9
+#equal_size = False use:
 custom_size_list = [
 (300, 300, 500, 700),
 (0, 100, 500, 300),
@@ -40,6 +42,7 @@ custom_size_list = [
 video = 'video/flow720p.mp4'
 
 #gen_frames is threadded and reads frames from the video and sends them to global variable current_frame.
+#This is so only one element reads from cap at any time.
 def gen_frames():
     while True:
         cap = cv2.VideoCapture(video)           
@@ -63,8 +66,6 @@ class MyServer(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "multipart/x-mixed-replace; boundary=new_frame")
         self.end_headers()
         while True:
-            #frame = cut_video(current_frame, number_of_squares, desired_square)
-            
             if equal_size == True:
                 frame_list = cut_whole_video(current_frame, number_of_squares)
             else:
@@ -80,11 +81,6 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(new_frame)
             
     def do_GET(self):
-        #desired_square_list = []
-        #for i in range(round(sqrt(number_of_squares))):
-        #    for j in range(round(sqrt(number_of_squares))):
-        #        desired_square_list.append((i,j))
-            
         for i in range(number_of_squares):
             if self.path == "/" + str(i):
                 self.create_domain(i)
@@ -93,8 +89,6 @@ class MyServer(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     t1 = Thread(target = gen_frames, args = ())
     t1.start()
-    #time.sleep(1)
-    #print(current_frame)
     webServer = ThreadingHTTPServer((hostName, serverPort), MyServer)
     print("Server started http://%s:%s" % (hostName, serverPort))  #Server starts
     try:
@@ -103,11 +97,4 @@ if __name__ == "__main__":
         pass
     webServer.server_close()  #Executes when you hit a keyboard interrupt, closing the server
     print("Server stopped.")
-
-    #Release cap
-    
-   
-    # Closes all the frames
-    #cv2.destroyAllWindows()
-
 

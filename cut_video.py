@@ -24,8 +24,7 @@ def cut_video(frame, number_of_squares, desired_square):
     
     return new_frame
 
-#cut_whole_video will return a list of all of the cut frames.
-
+#cut_whole_video will take number_of_squares and generate a list, frame_list, of equal sized and distributed frames in a grid.
 def cut_whole_video(frame, number_of_squares):
     sqrt_of_number_of_squares = sqrt(number_of_squares)
 
@@ -41,6 +40,7 @@ def cut_whole_video(frame, number_of_squares):
 
     return frame_list
 
+#cut_custom_video will take a list of four element tuples, custom_size_list, and generate a list, frame_list, of custom sized frames. 
 def cut_custom_video(frame, custom_size_list):
     frame_list = []
     
