@@ -40,3 +40,14 @@ def cut_whole_video(frame, number_of_squares):
             frame_list.append(new_frame)
 
     return frame_list
+
+def cut_custom_video(frame, custom_size_list):
+    frame_list = []
+    
+    for custom_size in custom_size_list:
+        start_width, start_height, width, height = custom_size
+        new_frame = frame[start_height:height, start_width:width]
+        frame_list.append(new_frame)
+        
+    return frame_list
+    
