@@ -19,7 +19,7 @@ current_frame = None
 # If equal_size is True, will automatically generate equal sized slices in a grid.  custom_size_list can be ignored.
 # If equal_size is False, will use custom_size_list to determine size and number of slices.  number_of_squares can be ignored.
 #Are slices equal size?  If so, square root of number_of_squares must be an integer.
-equal_size = True
+equal_size = False
 #For custom sizes, define start and end positions in pixels.
 #(start_x, start_y, width, height)
 #start x,y --------------> Width x
@@ -30,17 +30,17 @@ equal_size = True
 #         V|-------------|
 #       Height y
 #equal_size = True use:
-number_of_squares = 9
+number_of_squares = 4
 #equal_size = False use:
 custom_size_list = [
-(300, 300, 500, 700),
+(0, 0, 1280, 720),
 (0, 100, 500, 300),
 (500, 300, 600, 350),
 ]
 
 #Video to be split
+#video = 'video/bob.mp4'
 video = 'video/flow720p.mp4'
-
 #gen_frames is threadded and reads frames from the video and sends them to global variable current_frame.
 #This is so only one element reads from cap at any time.
 def gen_frames():
