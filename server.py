@@ -6,6 +6,10 @@ from cut_video import cut_custom_video, cut_whole_video
 from queue import Queue
 from threading import Thread
 from parse import *
+import numpy as np
+from mss import mss
+from PIL import Image
+
 
 #Hostname for access to video.  0.0.0.0 will allow access from other devices on network.
 hostName = "0.0.0.0"
@@ -33,10 +37,14 @@ equal_size = False
 number_of_squares = 4
 #equal_size = False use:
 custom_size_list = [
-(0, 0, 1280, 720),
+(0, 0, 1024, 720),
 (0, 100, 500, 300),
 (500, 300, 600, 350),
 ]
+
+bounding_box = {'top': -1440, 'left': 0, 'width': 1024, 'height': 720}
+
+sct = mss()
 
 #Video to be split
 #video = 'video/bob.mp4'
@@ -50,15 +58,17 @@ def gen_frames():
         if (cap.isOpened()== False): 
             print("Error opening video  file")
         while True:
-            success, frame = cap.read()  # read the camera frame
+            success, frame1 = cap.read()  # read the camera frame
+            sct_img = sct.grab(bounding_box)
             if not success:
                 cap.release()
                 cap = cv2.VideoCapture(video)
             else:
                 time.sleep(.033)
                 global current_frame
-                current_frame = frame
-
+                current_frame = np.array(sct_img)
+       
+    
 #Sets up a web server, creates the neccisary number of domains, and sends the video slices to each.  Domains are numbered 0-x.
 class MyServer(BaseHTTPRequestHandler):
     def create_domain(self, i):
